@@ -1,0 +1,106 @@
+---
+title: "Final (Putting together)"
+author: "Alon Robbins Will Dean"
+format: 
+  html:
+    code-fold: show
+    toc: true
+    number-sections: true
+    embed-resources: true
+editor: visual
+execute:
+  echo: true
+  message: false
+  warning: false
+---
+
+## Final Assignment – Putting Together
+
+### Load libraries
+```{r}
+library(tidyverse)
+```
+
+### Load injury risk function
+```{r}
+source("injury_risk.R")
+```
+
+### Generate random data for hours & experience 
+```{r}
+# Generate random data for hours and experience
+
+# Randomly generate hours (between 1 and 6 hours)
+hours_values <- sample(1:6, 20, replace = TRUE)
+
+# Randomly generate experience levels
+experience_levels <- sample(c("beginner", "intermediate", "skilled", "pro"), 20, replace = TRUE)
+
+# Create a data frame of the random combinations
+random_data <- data.frame(hours = hours_values, experience = experience_levels)
+
+# View the generated random data
+head(random_data)
+
+```
+
+### Using for loop to calculate injury risk
+```{r}
+# Initialize an empty vector to store the injury risks
+injury_risk_results_for <- numeric(length = nrow(random_data))
+
+# Loop over the rows and calculate the injury risk for each combination
+for (i in 1:nrow(random_data)) {
+  injury_risk_results_for[i] <- compute_injury_risk(
+    random_data$hours[i], 
+    random_data$experience[i], 
+    hold_size = "medium", 
+    hold_type = "pinch"
+  )
+}
+
+# Add the injury risk results to the random data frame
+random_data$injury_risk_for <- injury_risk_results_for
+
+# View the updated data with injury risk
+head(random_data)
+
+
+```
+
+### Using pmap
+```{r}
+# Using the purrr package's pmap function to run the same calculations
+injury_risk_results_pmap <- pmap(
+  list(hours = random_data$hours, 
+       experience = random_data$experience),
+  ~compute_injury_risk(..1, ..2, hold_size = "medium", hold_type = "pinch")
+)
+
+# Add the injury risk results to the random data frame
+random_data$injury_risk_pmap <- unlist(injury_risk_results_pmap)
+
+# View the updated data with injury risk
+head(random_data)
+
+
+```
+
+### Visualizing the results
+```{r}
+# Graph the injury risk vs hours with experience level as color
+ggplot(random_data, aes(x = hours, y = injury_risk_for, color = experience)) +
+  geom_point(size = 4) +  # Add points for the 'for' loop results
+  labs(
+    title = "Injury Risk by Hours and Experience Level (Using For Loop)",
+    x = "Hours of Climbing",
+    y = "Injury Risk",
+    color = "Experience Level"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "top")  # Put the legend at the top
+
+```
+
+
+
