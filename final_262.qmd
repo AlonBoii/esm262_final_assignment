@@ -52,21 +52,25 @@ head(random_data)
 ### Using for loop to calculate injury risk
 
 ```{r}
-# Initialize an empty vector to store the injury risks
+# Initialize empty vectors to store the injury risks and statuses
 injury_risk_results_for <- numeric(length = nrow(random_data))
+status_results_for <- character(length = nrow(random_data))
 
-# Loop over the rows and calculate the injury risk for each combination
+# Loop over the rows and calculate the injury risk and status for each combination
 for (i in 1:nrow(random_data)) {
-  injury_risk_results_for[i] <- compute_injury_risk(
+  result <- compute_injury_risk(
     random_data$hours[i], 
     random_data$experience[i], 
     hold_size = "medium", 
     hold_type = "pinch"
   )
+  injury_risk_results_for[i] <- result$injury_risk
+  status_results_for[i] <- result$status
 }
 
-# Add the injury risk results to the random data frame
+# Add the injury risk and status results to the random data frame
 random_data$injury_risk_for <- injury_risk_results_for
+random_data$status_for <- status_results_for
 
 # View the updated data with injury risk
 head(random_data)
@@ -84,8 +88,13 @@ injury_risk_results_pmap <- pmap(
   ~compute_injury_risk(..1, ..2, hold_size = "medium", hold_type = "pinch")
 )
 
-# Add the injury risk results to the random data frame
-random_data$injury_risk_pmap <- unlist(injury_risk_results_pmap)
+# Extract injury risk and status from the pmap output
+injury_risk_values <- sapply(injury_risk_results_pmap, function(x) x$injury_risk)
+status_values <- sapply(injury_risk_results_pmap, function(x) x$status)
+
+# Add the injury risk and status results to the random data frame
+random_data$injury_risk_pmap <- injury_risk_values
+random_data$status_pmap <- status_values
 
 # View the updated data with injury risk
 head(random_data)
@@ -96,28 +105,27 @@ head(random_data)
 ### Visualizing the results
 
 ```{r}
-# Graph the injury risk vs hours with experience level as color
 ggplot(random_data, aes(x = hours, y = injury_risk_pmap, color = experience)) +
-  geom_point(size = 3) +
-  geom_smooth(method = "lm", se = FALSE, aes(group = experience)) + 
+  geom_point(size = 4, alpha = 0.7) +  # Points with transparency for better clarity
+  geom_smooth(method = "lm", se = FALSE, aes(group = experience), size = 1.2, linetype = "solid") +  # Thicker line and solid style
+  scale_color_manual(values = c("beginner" = "#1f77b4", "intermediate" = "#ff7f0e", "skilled" = "#2ca02c", "pro" = "#d62728")) +  # Manual color scale
   labs(
     title = "Injury Risk by Experience Level and Hours",
     x = "Climbing Hours",
     y = "Injury Risk"
   ) +
-  theme_minimal()
-  theme(legend.position = "top")  
+  theme_minimal() +
+  theme(
+    legend.position = "top",  # Move the legend to the top
+    legend.title = element_text(size = 14, face = "bold"),  # Make legend title bold and larger
+    legend.text = element_text(size = 12),  # Increase legend text size
+    axis.title = element_text(size = 14),  # Increase axis title size
+    axis.text = element_text(size = 12),   # Increase axis label size
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),  # Center and make title bold
+    panel.grid.major = element_line(size = 0.5, color = "gray90"),  # Customize grid lines
+    panel.grid.minor = element_line(size = 0.25, color = "gray95")  # Adjust minor grid lines
+  )
 
 
-# ggplot(random_data, aes(x = hours, y = injury_risk_for, color = experience)) +
-#   geom_point(size = 4) +
-#   labs(
-#     title = "Injury Risk by Hours and Experience Level (Using For Loop)",
-#     x = "Hours of Climbing",
-#     y = "Injury Risk",
-#     color = "Experience Level"
-#   ) +
-#   theme_minimal() +
-#   theme(legend.position = "top")
 
 ```

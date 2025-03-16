@@ -1,7 +1,8 @@
 #' Compute Injury Risk During Climbing Sessions
 #'
 #' This function calculates the potential injury risk based on the duration of a climbing session, the climber's experience level,
-#' the size and type of holds used, and returns an injury risk score. The function also includes error checks for unrealistic inputs.
+#' the size and type of holds used, and returns an injury risk score along with a status message ("Injured" or "Safe").
+#' The function also includes error checks for unrealistic inputs.
 #'
 #' @param hours A numeric value representing the number of hours spent in a climbing session. The value should be between 1 and 6.
 #' @param experience A character string indicating the climber's experience level. It can be one of the following:
@@ -11,8 +12,9 @@
 #' @param hold_type A character string indicating the type of holds used in the climbing session. It can be one of:
 #'        "crimp", "pinch", or "jug". Crimp holds are riskier compared to pinch and jug holds.
 #' 
-#' @return injury_risk
-
+#' @return A list containing:
+#'         - injury_risk: The calculated injury risk score.
+#'         - status: The injury status ("Injured" or "Safe").
 compute_injury_risk <- function(hours, experience, hold_size, hold_type) {
   
   # Error checks:
@@ -85,12 +87,10 @@ compute_injury_risk <- function(hours, experience, hold_size, hold_type) {
   # Combine all factors to compute injury risk
   injury_risk <- hours_factor * experience_factor * hold_size_factor * hold_type_factor
   
-  #if injury risk is greater than or equal to 0.45, return "Injured"
-  if (injury_risk >= 0.45) {
-    warning("Injured")
-  }
+  # Define status based on injury risk
+  status <- ifelse(injury_risk >= 0.45, "Injured", "Safe")
   
-  return(injury_risk)
+  # Return both injury risk and status as a list
+  return(list(injury_risk = injury_risk, status = status))
 }
-
 
