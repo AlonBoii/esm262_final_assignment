@@ -1,6 +1,6 @@
 ---
 title: "Final (Putting together)"
-author: "Alon Robbins Will Dean"
+author: "Alon Robbins, Will Dean"
 format: 
   html:
     code-fold: show
@@ -16,17 +16,22 @@ execute:
 
 ## Final Assignment – Putting Together
 
+![](https://pulseclimbing.com.au/wp-content/uploads/2022/10/HAND.jpg){alt="Crimping ain't easy - Pulse"}
+
 ### Load libraries
+
 ```{r}
 library(tidyverse)
 ```
 
 ### Load injury risk function
+
 ```{r}
 source("injury_risk.R")
 ```
 
-### Generate random data for hours & experience 
+### Generate random data for hours & experience
+
 ```{r}
 # Generate random data for hours and experience
 
@@ -45,6 +50,7 @@ head(random_data)
 ```
 
 ### Using for loop to calculate injury risk
+
 ```{r}
 # Initialize an empty vector to store the injury risks
 injury_risk_results_for <- numeric(length = nrow(random_data))
@@ -69,6 +75,7 @@ head(random_data)
 ```
 
 ### Using pmap
+
 ```{r}
 # Using the purrr package's pmap function to run the same calculations
 injury_risk_results_pmap <- pmap(
@@ -87,20 +94,30 @@ head(random_data)
 ```
 
 ### Visualizing the results
+
 ```{r}
 # Graph the injury risk vs hours with experience level as color
-ggplot(random_data, aes(x = hours, y = injury_risk_for, color = experience)) +
-  geom_point(size = 4) +  # Add points for the 'for' loop results
+ggplot(random_data, aes(x = hours, y = injury_risk_pmap, color = experience)) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = FALSE, aes(group = experience)) + 
   labs(
-    title = "Injury Risk by Hours and Experience Level (Using For Loop)",
-    x = "Hours of Climbing",
-    y = "Injury Risk",
-    color = "Experience Level"
+    title = "Injury Risk by Experience Level and Hours",
+    x = "Climbing Hours",
+    y = "Injury Risk"
   ) +
-  theme_minimal() +
-  theme(legend.position = "top")  # Put the legend at the top
+  theme_minimal()
+  theme(legend.position = "top")  
+
+
+# ggplot(random_data, aes(x = hours, y = injury_risk_for, color = experience)) +
+#   geom_point(size = 4) +
+#   labs(
+#     title = "Injury Risk by Hours and Experience Level (Using For Loop)",
+#     x = "Hours of Climbing",
+#     y = "Injury Risk",
+#     color = "Experience Level"
+#   ) +
+#   theme_minimal() +
+#   theme(legend.position = "top")
 
 ```
-
-
-

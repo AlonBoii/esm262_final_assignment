@@ -18,39 +18,39 @@ compute_injury_risk <- function(hours, experience, hold_size, hold_type) {
   # Error checks:
   # Check if hours is 0 or negative
   if (hours <= 0) {
-    return("Hours must be a positive value, unrealistic")
+    warning("Hours must be a positive value, unrealistic")
   }
   
   # Check if hours exceed 6
   if (hours > 6) {
-    return("A climbing session normally would not go over 6 hours at the most extreme circumstances, unrealistic")
+    warning("A climbing session normally would not go over 6 hours at the most extreme circumstances, unrealistic")
   }
   
   # Check if "beginner" is climbing more than 3 hours
   if (experience == "beginner" && hours > 3) {
-    return("A beginner isn't likely to climb more than 3 hours, unrealistic")
+    warning("A beginner isn't likely to climb more than 3 hours, unrealistic")
   }
   
   # Check if "pro" is training on "jug" hold
   if (experience == "pro" && hold_type == "jug") {
-    return("A pro isn't likely to be training on jugs, unrealistic")
+    warning("A pro isn't likely to be training on jugs, unrealistic")
   }
   
   # Check if "beginner" is using "crimp"
   if (experience == "beginner" && hold_type == "crimp") {
-    return("A beginner isn't likely to be training on crimps, unrealistic")
+    warning("A beginner isn't likely to be training on crimps, unrealistic")
   }
   
   # Check if experience level is valid
   valid_experience <- c("beginner", "intermediate", "skilled", "pro")
   if (!(experience %in% valid_experience)) {
-    return("Invalid experience level. Please choose from: beginner, intermediate, skilled, or pro.")
+    stop("Invalid experience level. Please choose from: beginner, intermediate, skilled, or pro.")
   }
   
   # Check if hold size is valid
   valid_hold_size <- c("tiny", "small", "medium", "large")
   if (!(hold_size %in% valid_hold_size)) {
-    return("Invalid hold size. Please choose from: tiny, small, medium, or large.")
+    stop("Invalid hold size. Please choose from: tiny, small, medium, or large.")
   }
   
   # Check if hold type is valid
@@ -84,6 +84,11 @@ compute_injury_risk <- function(hours, experience, hold_size, hold_type) {
   
   # Combine all factors to compute injury risk
   injury_risk <- hours_factor * experience_factor * hold_size_factor * hold_type_factor
+  
+  #if injury risk is greater than or equal to 0.45, return "Injured"
+  if (injury_risk >= 0.45) {
+    warning("Injured")
+  }
   
   return(injury_risk)
 }
