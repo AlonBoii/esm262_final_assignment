@@ -58,7 +58,7 @@ compute_injury_risk <- function(hours, experience, hold_size, hold_type) {
   # Check if hold type is valid
   valid_hold_type <- c("crimp", "pinch", "jug")
   if (!(hold_type %in% valid_hold_type)) {
-    return("Invalid hold type. Please choose from: crimp, pinch, or jug.")
+    stop("Invalid hold type. Please choose from: crimp, pinch, or jug.")
   }
   
   # Hours factor (more hours = more risk)
